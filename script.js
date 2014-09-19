@@ -16,7 +16,7 @@ function init()
 	//scene.add( line );
 	
 	t = new Tree();
-	t.createCloud(new THREE.Vector3(0,2,0),new THREE.Vector3(4,2,4),4000);
+	t.createCloud(new THREE.Vector3(0,2,0),new THREE.Vector3(4,2,4),1000);
 	t.generateStem(1);
 	
 	gi = setInterval(grow,100);
@@ -28,7 +28,7 @@ function init()
 
 function grow()
 {
-	if (!t.grow(0.2,2))
+	if (!t.grow(0.1,0.5))
 		clearInterval(gi);
 	
 	t.addToScene();
@@ -52,7 +52,7 @@ function Tree()
 	this.branchVertices;
 	this.branchGeometry;
 	
-	this.segmentSize = 0.08;
+	this.segmentSize = 0.05;
 	
 	this.count = 0;
 	
@@ -160,7 +160,7 @@ function Tree()
 			}
 			this.branchGeometry = new THREE.Geometry();
 			this.branchGeometry.vertices = this.branchVertices;
-			this.branchLines = new THREE.Line(this.branchGeometry, new THREE.LineBasicMaterial({color: 0xaa6611}),THREE.LinePieces);
+			this.branchLines = new THREE.Line(this.branchGeometry, new THREE.LineBasicMaterial({color: 0xaa6611, linewidth: 3}),THREE.LinePieces);
 			
 			this.count = this.branches.length;
 			
