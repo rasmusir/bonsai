@@ -12,10 +12,85 @@
                 margin: 0px;
                 padding: 0px;
 				overflow: hidden;
+				perspective: 1920px;
             }
+			
+			#canvas
+			{
+				height: 100%;
+				width: 100%;
+				margin: 0px;
+				padding: 0px;
+				background: red;
+				position: absolute;
+				left: 0px;
+				top: 0px;
+				z-index: 0;
+			}
+			
+			#canvas canvas
+			{
+				position: absolute;
+				left: 0px;
+				top: 0px;
+				z-index: 0;
+			}
+			
+			#settings
+			{
+				color: white;
+				font-family: sans-serif;
+				
+				border-right: 1px solid gray;
+				
+				z-index: 3;
+				position: absolute;
+				left: 0px;
+				top: 0px;
+				height: 100%;
+				width: 400px;
+				background: rgba(0,0,0,0.7);
+				opacity: 0;
+				visibility: hidden;
+				
+				transform: rotateY(90deg);
+				transform-origin: 0% 0%;
+				transition: transform 0.6s, visibility 0.6s, opacity 0.3s;
+				
+			}
+			
+			#settings:hover
+			{
+				transform: rotateY(0deg);
+				visibility: visible;
+				opacity: 1;
+			}
+			#settingshover:hover + #settings
+			{
+				transform: rotateY(0deg);
+				visibility: visible;
+				opacity: 1;
+			}
+			#settingshover:hover
+			{
+				width: 400px;
+			}
+			
+			#settingshover
+			{
+				width: 50px;
+				height: 100%;
+				position: absolute;
+				top: 0px;
+				lefT: 0px;
+				z-index: 2;
+			}
+			
         </style>
     </head>
     <body>
-        <div id="canvas" style="height: 100%; width: 100%; margin: 0px; padding: 0px; background: red;"/>
+		<div id="settingshover"> </div>
+		<div id="settings">	asdasd</div>
+        <div id="canvas"> </div>
     </body>
 </html>

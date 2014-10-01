@@ -11,25 +11,22 @@ function init()
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(window.innerWidth,window.innerHeight);
 	document.getElementById("canvas").appendChild(renderer.domElement);
-
-	//var line = new THREE.Line(createTree(),new THREE.LineBasicMaterial({color: 0x99ff33}),THREE.LinePieces);
-	//scene.add( line );
 	
-	var light = new THREE.DirectionalLight( 0xffffff, 1);
+	var light = new THREE.DirectionalLight( 0xfffff0, 1);
 	light.position.set(1,1,1);
 	scene.add(light);
 	
-	var ambientLight = new THREE.AmbientLight(0x404040);
+	var ambientLight = new THREE.AmbientLight(0x505050);
 	scene.add(ambientLight);
 	
 	t = new Tree();
-	t.createCloud(new THREE.Vector3(-0.7,1.2,0),new THREE.Vector3(3,1,3),5000);
+	t.createCloud(new THREE.Vector3(-0.8,1.3,0),new THREE.Vector3(3,1,3),1000);
 	t.generateStem(1);
 	
 	gi = setInterval(grow,10);
 	
-	camera.position.z = 3;
-	camera.position.y = 0.8;
+	camera.position.z = 2.5;
+	camera.position.y = 1;
 	render();
 }
 
@@ -261,7 +258,16 @@ function Tree()
 	this.buildLeaves = function()
 	{
 		var geometry = new THREE.Geometry();
-		var mat = new THREE.MeshLambertMaterial( {color: 0xffaaaa, map: THREE.ImageUtils.loadTexture("images/leafmask.png"), alphaMap: THREE.ImageUtils.loadTexture("images/leafmask.png"),transparent: true, side: THREE.DoubleSide});
+		
+		var mat = new THREE.MeshLambertMaterial( {
+			color: 0xffaaaa,
+			map: THREE.ImageUtils.loadTexture("images/leaf.png"),
+			alphaMap: THREE.ImageUtils.loadTexture("images/leafmask.png"),
+			transparent: true,
+			side: THREE.DoubleSide,
+			alphaTest: 0.6
+		});
+		
 		for (var i = 0; i < this.branches.length; i++)
 		{
 			var b = this.branches[i];
@@ -271,7 +277,7 @@ function Tree()
 				var c = Math.random()*20;
 				for (var j = 0; j < c; j++)
 				{
-					var g = new THREE.PlaneGeometry(0.1,0.05);
+					var g = new THREE.PlaneGeometry(0.1,0.1);
 					g.applyMatrix(new THREE.Matrix4().makeTranslation(0.1,0,0));
 					g.applyMatrix(new THREE.Matrix4().makeRotationX( Math.random()*Math.PI*2));
 					g.applyMatrix(new THREE.Matrix4().makeRotationY( Math.random()*Math.PI*2));
@@ -297,47 +303,6 @@ Tree.Segment = function(pos,parent){
 	this.growDirection = new THREE.Vector3(0,0,0);
 };
 
-/*
-function createTree()
-{
-	var geometry = new THREE.Geometry();
-	var vertices = [];
-	var tilt = 0;
-	var q = new THREE.Quaternion();
-	var last = new THREE.Vector3(0,0,0);
-	
-	createBranch(geometry,last,tilt,0.1,10);
-	
-	
-	return geometry;
-}
-
-function createBranch(geometry,start,tilt,potency,count)
-{
-	var q = new THREE.Quaternion();
-	tilt += (Math.random()-0.5)*0.6;
-	q.setFromAxisAngle(new THREE.Vector3(0,0,1),tilt);
-	var vector = new THREE.Vector3(0,0.5,0);
-	vector.applyQuaternion(q);
-	geometry.vertices.push(start);
-	vector.add(start);
-	geometry.vertices.push(vector);
-	
-	//geometry.vertices.push(start+vector);
-	
-	if (count > 0 && Math.random()*10-count > potency)
-	{
-		var te = Math.PI/4;
-		if (Math.random()>.5) {te = -te;}
-		createBranch(geometry,vector,tilt+te,potency*0.5,count-1);
-	}
-	
-	if (count>0)
-	{
-		createBranch(geometry,vector,tilt,potency*0.5,count-1);
-	}
-}
-*/
 document.onreadystatechange = function () {
   if (document.readyState == "complete") {
     init();
