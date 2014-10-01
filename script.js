@@ -137,6 +137,7 @@ function Tree()
 			if (branch.growCount > 0)
 			{
 				branch.growDirection.divideScalar(branch.growCount);
+				branch.growDirection.normalize();
 				var pos = branch.growDirection.clone();
 				pos.multiplyScalar(this.segmentSize);
 				pos.add(branch.pos);
