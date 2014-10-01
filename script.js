@@ -19,7 +19,7 @@ function init()
 	t.createCloud(new THREE.Vector3(0,2,0),new THREE.Vector3(4,2,4),1000);
 	t.generateStem(1);
 	
-	gi = setInterval(grow,100);
+	gi = setInterval(grow,10);
 	
 	camera.position.z = 5;
 	camera.position.y = 2;
@@ -29,7 +29,10 @@ function init()
 function grow()
 {
 	if (!t.grow(0.1,0.5))
+	{
 		clearInterval(gi);
+		t.buildMesh();
+	}
 	
 	t.addToScene();
 }
@@ -38,7 +41,10 @@ function render()
 {
 	requestAnimationFrame(render);
 	rot += 0.01;
-	t.branchLines.rotation.y = rot;
+	if (t.branchLines != null)
+		t.branchLines.rotation.y = rot;
+	if (t.mesh != null)
+		t.mesh.rotation.y = rot;
 	
 	renderer.render(scene,camera);
 }
@@ -52,9 +58,13 @@ function Tree()
 	this.branchVertices;
 	this.branchGeometry;
 	
+	this.complexGeometry;
+	
 	this.segmentSize = 0.05;
 	
 	this.count = 0;
+	
+	this.mesh;
 	
 	this.createCloud = function(position,size,count)
 	{
@@ -79,6 +89,7 @@ function Tree()
 		{
 			this.branches.push(new Tree.Segment(new THREE.Vector3(0,i*this.segmentSize,0)));
 			this.branches[i].growDirection = new THREE.Vector3(0,1,0);
+			this.branches[i].age = (segments - i);
 			if (i!=0)
 				this.branches[i].parent = this.branches[i-1];
 		}
@@ -120,7 +131,7 @@ function Tree()
 			closestBranch.growDirection.add(p);
 		}
 		
-		for (var i = 0; i<this.branches.length; i++)
+		for (var i = this.branches.length - 1; i>=0; i--)
 		{
 			var branch = this.branches[i];
 			if (branch.growCount > 0)
@@ -135,8 +146,12 @@ function Tree()
 				branch.growCount = 0;
 				branch.growDirection = new THREE.Vector3(0,0,0);
 				this.branches.push(b);
+				
 				again = true;
 			}
+			
+			branch.age++;
+			
 		}
 		
 		return again;
@@ -152,6 +167,10 @@ function Tree()
 		if  (this.branchVertices == null || true)
 		{
 			scene.remove(this.branchLines);
+			
+			var g = new THREE.CylinderGeometry(0.1,0.1,this.segmentSize,6,1,true);
+			//var m = 
+			
 			this.branchVertices = [];
 			for (var i = 1; i<this.branches.length; i++)
 			{
@@ -162,8 +181,8 @@ function Tree()
 			this.branchGeometry.vertices = this.branchVertices;
 			this.branchLines = new THREE.Line(this.branchGeometry, new THREE.LineBasicMaterial({color: 0xaa6611, linewidth: 3}),THREE.LinePieces);
 			
-			this.count = this.branches.length;
 			
+			this.count = this.branches.length;
 			scene.add(this.branchLines);
 		}
 		else
@@ -178,13 +197,38 @@ function Tree()
 		}
 	};
 	
-	
+	this.buildMesh = function()
+	{
+		var geometry = new THREE.Geometry();
+		
+		for (var i = 1; i<this.branches.length; i++)
+		{
+			var b = this.branches[i];
+			var g = new THREE.CylinderGeometry(b.age/1000*2,b.parent.age/1000*2,this.segmentSize,6,1,true);
+			g.applyMatrix( new THREE.Matrix4().makeTranslation( 0, this.segmentSize / 2, 0 ) );
+			g.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
+			var m = new THREE.Mesh(g, new THREE.MeshNormalMaterial());
+			m.position.y = b.parent.pos.y;
+			m.position.x = b.parent.pos.x;
+			m.position.z = b.parent.pos.z;
+			m.up = new THREE.Vector3(1,0,0);
+			m.lookAt(b.pos);
+			
+			THREE.GeometryUtils.merge(geometry,m);
+		}
+		
+		this.mesh = new THREE.Mesh(geometry,new THREE.MeshNormalMaterial());
+		scene.remove(this.branchLines);
+		scene.add(this.mesh);
+	};
 }
 
 Tree.Segment = function(pos,parent){
 	this.pos = pos;
 	this.parent = parent;
 	this.growCount = 0;
+	this.age = 0;
+	this.grew = false;
 	this.growDirection = new THREE.Vector3(0,0,0);
 };
 
