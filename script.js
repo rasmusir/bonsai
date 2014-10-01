@@ -16,7 +16,7 @@ function init()
 	//scene.add( line );
 	
 	t = new Tree();
-	t.createCloud(new THREE.Vector3(0,2,0),new THREE.Vector3(4,2,4),1000);
+	t.createCloud(new THREE.Vector3(-2.5,2,0),new THREE.Vector3(8,2,8),10000);
 	t.generateStem(1);
 	
 	gi = setInterval(grow,10);
@@ -28,13 +28,15 @@ function init()
 
 function grow()
 {
-	if (!t.grow(0.1,0.5))
+	if (!t.grow(0.5,1))
 	{
 		clearInterval(gi);
 		t.buildMesh();
 	}
-	
-	t.addToScene();
+	else
+	{
+		t.addToScene();
+	}
 }
 
 function render()
@@ -89,7 +91,7 @@ function Tree()
 		{
 			this.branches.push(new Tree.Segment(new THREE.Vector3(0,i*this.segmentSize,0)));
 			this.branches[i].growDirection = new THREE.Vector3(0,1,0);
-			this.branches[i].age = (segments - i);
+			this.branches[i].age = (segments - i)*(segments - i)/4;
 			if (i!=0)
 				this.branches[i].parent = this.branches[i-1];
 		}
@@ -131,7 +133,7 @@ function Tree()
 			closestBranch.growDirection.add(p);
 		}
 		
-		for (var i = this.branches.length - 1; i>=0; i--)
+		for (var i = this.branches.length - 1; i>=1; i--)
 		{
 			var branch = this.branches[i];
 			if (branch.growCount > 0)
@@ -149,9 +151,15 @@ function Tree()
 				this.branches.push(b);
 				
 				again = true;
+				branch.parent.grew++;
+			}
+			if (branch.grew>0)
+			{
+				branch.age++;
+				branch.parent.grew++;
 			}
 			
-			branch.age++;
+			branch.grew = 0;
 			
 		}
 		
@@ -205,7 +213,7 @@ function Tree()
 		for (var i = 1; i<this.branches.length; i++)
 		{
 			var b = this.branches[i];
-			var g = new THREE.CylinderGeometry(b.age/1000*2,b.parent.age/1000*2,this.segmentSize,6,1,true);
+			var g = new THREE.CylinderGeometry(b.age/1000*1.5,b.parent.age/1000*1.5,this.segmentSize,8,1,true);
 			g.applyMatrix( new THREE.Matrix4().makeTranslation( 0, this.segmentSize / 2, 0 ) );
 			g.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
 			var m = new THREE.Mesh(g, new THREE.MeshNormalMaterial());
@@ -218,6 +226,7 @@ function Tree()
 			THREE.GeometryUtils.merge(geometry,m);
 		}
 		
+		geometry.mergeVertices();
 		this.mesh = new THREE.Mesh(geometry,new THREE.MeshNormalMaterial());
 		scene.remove(this.branchLines);
 		scene.add(this.mesh);
@@ -229,7 +238,7 @@ Tree.Segment = function(pos,parent){
 	this.parent = parent;
 	this.growCount = 0;
 	this.age = 0;
-	this.grew = false;
+	this.grew = 0;
 	this.growDirection = new THREE.Vector3(0,0,0);
 };
 
