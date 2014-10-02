@@ -2,6 +2,9 @@
 <html>
     <head>
         <title>Bonsai</title>
+        <script src="platform.js"> </script>
+        <script src="CustomElements.js"> </script>
+        <script src="inputs.js"> </script>
         <script src="three.min.js"> </script>
         <script src="script.js"> </script>
         <style>
@@ -90,7 +93,13 @@
     </head>
     <body>
 		<div id="settingshover"> </div>
-		<div id="settings">	asdasd</div>
+		<div id="settings">
+		<div style="padding: 10px">
+		Cloud count: <input-slider id="clouddensity" min="100" max="5000"> </input-slider><input id="clouddensitynumber" type="number" min="100" max="5000"/>
+		<br/>
+		<button onclick="initTree()">Create Tree</button>
+		</div>
+		</div>
         <div id="canvas"> </div>
     </body>
 </html>

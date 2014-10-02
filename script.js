@@ -5,9 +5,11 @@ var renderer;
 var t;
 var gi;
 var  rot = 0;
+var settings;
 
 function init()
 {
+	settings = new Settings();
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(window.innerWidth,window.innerHeight);
 	document.getElementById("canvas").appendChild(renderer.domElement);
@@ -19,16 +21,30 @@ function init()
 	var ambientLight = new THREE.AmbientLight(0x505050);
 	scene.add(ambientLight);
 	
-	t = new Tree();
-	t.createCloud(new THREE.Vector3(-0.8,1.3,0),new THREE.Vector3(3,1,3),1000);
-	t.generateStem(1);
-	
-	gi = setInterval(grow,10);
+	initTree();
 	
 	camera.position.z = 2.5;
 	camera.position.y = 1;
 	render();
 }
+
+function initTree()
+{
+	if (t != null)
+		t.remove();
+	t = new Tree();
+	t.createCloud(new THREE.Vector3(-0.8,1.3,0),new THREE.Vector3(3,1,3),settings.cloud.value);
+	t.generateStem(1);
+	
+	gi = setInterval(grow,10);
+}
+
+function Settings()
+{
+	this.cloud = document.getElementById("clouddensity");
+	this.cloud.value = 1000;
+}
+
 
 function grow()
 {
@@ -291,6 +307,13 @@ function Tree()
 		this.leavesMesh = new THREE.Mesh(geometry, mat);
 		scene.add(this.leavesMesh);
 	}
+	
+	this.remove = function()
+	{
+		scene.remove(this.leavesMesh);
+		scene.remove(this.branchLines);
+		scene.remove(this.mesh);
+	};
 }
 
 Tree.Segment = function(pos,parent){
