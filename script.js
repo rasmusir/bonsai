@@ -23,7 +23,6 @@ function init()
 	scene.add(ambientLight);
 	
 	ghost = new Ghost();
-	ghost.add();
 	
 	initTree();
 	
